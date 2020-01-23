@@ -9,7 +9,7 @@ function App() {
   const userNameRef = useRef(null)
 
   const getUsers = () => {
-    axios.get('http://localhost:7543/users').then(res => {
+    axios.get('http://localhost:7434/users' + window.location.search).then(res => {
       setUsers(res.data);
     })
   }
@@ -19,7 +19,21 @@ function App() {
   }, [])
 
   const createUser = (name) => {
-    axios.post('http://localhost:7543/users', { name: userNameRef.current.value })
+    axios.post('http://localhost:7434/users', { name: userNameRef.current.value })
+      .then(res => {
+        getUsers();
+      })
+  }
+
+  const deleteUser = (id) => {
+    axios.delete(`http://localhost:7434/users/${id}`)
+      .then(res => {
+        getUsers();
+      })
+  }
+
+  const updateUser = (id, name) => {
+    axios.put('http://localhost:7434/users', { name, id })
       .then(res => {
         getUsers();
       })
@@ -29,7 +43,7 @@ function App() {
     <>
       <input ref={userNameRef} />
       <div><button onClick={createUser}>Create new user</button></div>
-      <div>{users.map(el => <div>{el.name}</div>)
+      <div>{users.map(el => <div><input onBlur={(e) => { updateUser(el._id, e.currentTarget.value) }} defaultValue={el.name} /><button onClick={() => deleteUser(el._id)}>X</button></div>)
       }</div>
     </>
   );
